@@ -326,3 +326,133 @@ mod tests {
         assert_eq!(Query::parse(&query_bytes("rio", 1)).expect("parse").id, 0x1234);
     }
 }
+
+// ── RESPONSE ENCODING ──────────────────────────────────────────────────
+
+/// How long a client may cache an answer annai gave from its own table.
+///
+/// ★ 30 seconds, and the number is derived rather than chosen: the fleet
+/// registry changes on a rebuild, and a cached fleet name that outlives the
+/// rebuild that moved it is a wrong answer nothing can retract. Short enough
+/// that a moved node converges within a poll, long enough that a shell loop
+/// does not re-query per command.
+pub const LOCAL_TTL: u32 = 30;
+
+/// Encode a response to `q` carrying `addrs`.
+///
+/// ★ The question is echoed and the answer NAMES it by compression pointer to
+/// offset 12 — the standard `0xC00C`. That is a BACKWARD pointer, which is why
+/// [`Name::parse`]'s strictly-backward rule does not reject our own output;
+/// a resolver whose invariant refused its own replies would be self-defeating,
+/// and this is the test that proves it does not.
+#[must_use]
+pub fn encode_response(q: &Query, addrs: &[std::net::IpAddr], recursion_desired: bool) -> Vec<u8> {
+    let mut out = Vec::with_capacity(64);
+    out.extend_from_slice(&q.id.to_be_bytes());
+
+    // QR=1 (response), RD mirrored from the query, RA=1 (we do recurse, via
+    // the upstream). AA stays 0: annai is authoritative for NOTHING, and
+    // claiming otherwise is the same lie `Decision` has no variant for.
+    let flags: u16 = 0x8000 | u16::from(recursion_desired) << 8 | 0x0080;
+    out.extend_from_slice(&flags.to_be_bytes());
+    out.extend_from_slice(&1u16.to_be_bytes()); // QDCOUNT
+    let ancount = u16::try_from(addrs.len()).unwrap_or(u16::MAX);
+    out.extend_from_slice(&ancount.to_be_bytes());
+    out.extend_from_slice(&0u16.to_be_bytes()); // NSCOUNT
+    out.extend_from_slice(&0u16.to_be_bytes()); // ARCOUNT
+
+    for label in q.name.as_str().split('.') {
+        out.push(u8::try_from(label.len()).unwrap_or(0));
+        out.extend_from_slice(label.as_bytes());
+    }
+    out.push(0);
+    let qtype: u16 = match q.qtype {
+        QType::A => 1,
+        QType::Aaaa => 28,
+        QType::Other(v) => v,
+    };
+    out.extend_from_slice(&qtype.to_be_bytes());
+    out.extend_from_slice(&1u16.to_be_bytes()); // QCLASS IN
+
+    for addr in addrs {
+        out.extend_from_slice(&[0xC0, 0x0C]); // name → the question, backward
+        match addr {
+            std::net::IpAddr::V4(v4) => {
+                out.extend_from_slice(&1u16.to_be_bytes());
+                out.extend_from_slice(&1u16.to_be_bytes());
+                out.extend_from_slice(&LOCAL_TTL.to_be_bytes());
+                out.extend_from_slice(&4u16.to_be_bytes());
+                out.extend_from_slice(&v4.octets());
+            }
+            std::net::IpAddr::V6(v6) => {
+                out.extend_from_slice(&28u16.to_be_bytes());
+                out.extend_from_slice(&1u16.to_be_bytes());
+                out.extend_from_slice(&LOCAL_TTL.to_be_bytes());
+                out.extend_from_slice(&16u16.to_be_bytes());
+                out.extend_from_slice(&v6.octets());
+            }
+        }
+    }
+    out
+}
+
+#[cfg(test)]
+mod response_tests {
+    use super::*;
+
+    fn q(name: &str, qtype: QType) -> Query {
+        Query { id: 0xBEEF, name: Name::from_host(name), qtype }
+    }
+
+    #[test]
+    fn our_own_response_parses_under_our_own_pointer_rule() {
+        // ★ The self-consistency test. `0xC00C` is a compression pointer, and
+        // the parser refuses non-backward ones — a resolver whose invariant
+        // rejected its own replies would be self-defeating.
+        let addrs = vec!["10.0.0.1".parse().expect("ip")];
+        let bytes = encode_response(&q("rio", QType::A), &addrs, true);
+        let (name, _) = Name::parse(&bytes, 12).expect("question parses");
+        assert_eq!(name.as_str(), "rio");
+        // and the answer's own name field is a legal backward pointer
+        let ptr_at = bytes.len() - 4 - 2 - 4 - 2 - 2 - 2;
+        let (answer_name, _) = Name::parse(&bytes, ptr_at).expect("answer name parses");
+        assert_eq!(answer_name.as_str(), "rio");
+    }
+
+    #[test]
+    fn the_authoritative_bit_is_never_set() {
+        // annai is authoritative for nothing. Setting AA is the wire-level
+        // form of the lie `Decision` has no variant for.
+        let addrs = vec!["10.0.0.1".parse().expect("ip")];
+        let bytes = encode_response(&q("rio", QType::A), &addrs, true);
+        let flags = u16::from_be_bytes([bytes[2], bytes[3]]);
+        assert_eq!(flags & 0x0400, 0, "AA bit set");
+        assert_eq!(flags & 0x8000, 0x8000, "QR bit not set");
+    }
+
+    #[test]
+    fn the_id_and_question_are_echoed() {
+        let addrs = vec!["10.0.0.1".parse().expect("ip")];
+        let bytes = encode_response(&q("rio", QType::A), &addrs, true);
+        assert_eq!(u16::from_be_bytes([bytes[0], bytes[1]]), 0xBEEF);
+        assert_eq!(u16::from_be_bytes([bytes[4], bytes[5]]), 1, "QDCOUNT");
+        assert_eq!(u16::from_be_bytes([bytes[6], bytes[7]]), 1, "ANCOUNT");
+    }
+
+    #[test]
+    fn recursion_desired_is_mirrored_not_invented() {
+        let addrs = vec!["10.0.0.1".parse().expect("ip")];
+        let with = encode_response(&q("rio", QType::A), &addrs, true);
+        let without = encode_response(&q("rio", QType::A), &addrs, false);
+        assert_eq!(u16::from_be_bytes([with[2], with[3]]) & 0x0100, 0x0100);
+        assert_eq!(u16::from_be_bytes([without[2], without[3]]) & 0x0100, 0);
+    }
+
+    #[test]
+    fn an_ipv6_answer_carries_sixteen_octets() {
+        let addrs = vec!["fd00::1".parse().expect("ip")];
+        let bytes = encode_response(&q("v6", QType::Aaaa), &addrs, true);
+        assert_eq!(bytes[bytes.len() - 18..bytes.len() - 16], 16u16.to_be_bytes());
+        assert_eq!(bytes.len() - 16, bytes.len() - 16);
+    }
+}

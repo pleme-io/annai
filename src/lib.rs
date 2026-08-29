@@ -36,7 +36,9 @@
 //! dnsmasq is that machine's ONLY resolver, so the cutover deserves its own
 //! measurement rather than riding in on a library commit.
 
+pub mod config;
 pub mod decide;
+pub mod introspect;
 pub mod table;
 pub mod wire;
 
