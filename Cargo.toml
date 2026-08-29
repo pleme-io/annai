@@ -1,0 +1,12 @@
+[package]
+name = "annai"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "annai (案内) — the fleet stub resolver: answer from a typed name table, forward the rest."
+repository = "https://github.com/pleme-io/annai"
+
+[dependencies]
+
+[lints.clippy]
+pedantic = "warn"
