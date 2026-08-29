@@ -39,6 +39,7 @@
 pub mod config;
 pub mod decide;
 pub mod introspect;
+pub mod serve;
 pub mod table;
 pub mod wire;
 

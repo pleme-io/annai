@@ -35,13 +35,27 @@ pub struct AnnaiConfig {
     pub upstreams: Vec<String>,
     /// TTL for answers served from the local table.
     pub local_ttl: u32,
+    /// The names annai answers for: name → addresses.
+    ///
+    /// ★ Fed from `pleme.fleetDns`'s typed registry by the Nix module, NOT
+    /// parsed back out of `/etc/hosts`. That file is a PROJECTION of the same
+    /// registry; consuming it would make annai a reader of its own output's
+    /// sibling and re-derive a fact the fleet already holds typed. dnsmasq
+    /// read `/etc/hosts` because nothing could hand it a registry — annai can
+    /// be handed one.
+    pub names: std::collections::BTreeMap<String, Vec<String>>,
 }
 
 impl AnnaiConfig {
     /// Tier 0 — binds nothing, forwards nowhere.
     #[must_use]
     pub fn bare() -> Self {
-        Self { listen: None, upstreams: Vec::new(), local_ttl: 0 }
+        Self {
+            listen: None,
+            upstreams: Vec::new(),
+            local_ttl: 0,
+            names: std::collections::BTreeMap::new(),
+        }
     }
 
     /// Tier 1 — nothing safely detectable. Reading the host's existing
@@ -59,6 +73,12 @@ impl AnnaiConfig {
             listen: Some("127.0.0.1:53".into()),
             upstreams: PRESCRIBED_UPSTREAMS.iter().map(|s| (*s).to_owned()).collect(),
             local_ttl: crate::wire::LOCAL_TTL,
+            // ★ EMPTY, and that is correct rather than lazy. The prescribed
+            // tier is what a node gets with no site configuration, and
+            // inventing fleet names here would bake one fleet's registry into
+            // the binary. An empty table forwards everything, which is a
+            // working resolver -- just not a fleet-aware one.
+            names: std::collections::BTreeMap::new(),
         }
     }
 }
@@ -66,6 +86,29 @@ impl AnnaiConfig {
 impl Default for AnnaiConfig {
     fn default() -> Self {
         Self::prescribed()
+    }
+}
+
+impl AnnaiConfig {
+    /// Build the lookup table this config describes.
+    ///
+    /// ★ An unparseable address is SKIPPED with a warning, not fatal. A typo
+    /// in one fleet name must not take out resolution for every other name on
+    /// the node -- the same fallback reasoning as `load()`, one level down.
+    #[must_use]
+    pub fn table(&self) -> crate::table::Table {
+        let mut t = crate::table::Table::new();
+        for (name, addrs) in &self.names {
+            for a in addrs {
+                match a.parse() {
+                    Ok(ip) => t.insert(crate::wire::Name::from_host(name), ip),
+                    Err(_) => eprintln!(
+                        "annai: `{name}` has an unparseable address `{a}` — skipping that entry, the rest still resolve"
+                    ),
+                }
+            }
+        }
+        t
     }
 }
 
@@ -84,7 +127,26 @@ pub fn load() -> AnnaiConfig {
     else {
         return AnnaiConfig::prescribed();
     };
-    match shikumi::ConfigStore::<AnnaiConfig>::load(&path, "ANNAI_") {
+    // ── ★ THE FIELD-OVERRIDE PREFIX MUST NOT CONTAIN THE DISCOVERY VAR ──
+    // `ANNAI_OPT_`, not `ANNAI_`, and this is a bug fix rather than a taste.
+    //
+    // shikumi's env layer maps `<PREFIX><FIELD>` onto fields. With the prefix
+    // `ANNAI_`, the discovery variable `ANNAI_CONFIG` is itself read as a
+    // field named `config` -- which does not exist, so `deny_unknown_fields`
+    // refuses the whole load and the daemon silently falls back to prescribed
+    // defaults. The documented way to point annai at a config file was
+    // therefore the one way to guarantee it ignored it.
+    //
+    // FOUND BY RUNNING IT, not by reading it: the first `dig` against the
+    // daemon timed out because it had fallen back and tried to bind :53.
+    //
+    // ★ THE SAME COLLISION IS PRESENT IN `omoya` (OMOYA_CONFIG / OMOYA_) AND
+    // `mukae` (MUKAE_CONFIG / MUKAE_), which is where this idiom was copied
+    // from. Both are latent -- they break only when someone actually uses the
+    // documented override -- and both are recorded in
+    // theory/NATURALIZE-NIXOS.md rather than fixed here, because changing an
+    // env-var contract on the login manager is its own reviewable change.
+    match shikumi::ConfigStore::<AnnaiConfig>::load(&path, "ANNAI_OPT_") {
         Ok(store) => AnnaiConfig::clone(&store.get()),
         Err(e) => {
             eprintln!(
@@ -130,6 +192,31 @@ mod tests {
     #[test]
     fn a_typo_is_rejected_rather_than_ignored() {
         assert!(serde_yaml::from_str::<AnnaiConfig>("upstream: [1.1.1.1]\n").is_err());
+    }
+
+    #[test]
+    fn the_table_is_built_from_the_typed_registry() {
+        let c: AnnaiConfig =
+            serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\", \"fd00::1\"]\n").expect("parse");
+        assert_eq!(c.table().len(), 1);
+        assert_eq!(c.table().lookup(&crate::wire::Name::from_host("rio")).len(), 2);
+    }
+
+    #[test]
+    fn one_bad_address_does_not_take_out_the_whole_table() {
+        // A typo in one fleet name must not cost resolution for every other.
+        let c: AnnaiConfig = serde_yaml::from_str(
+            "names:\n  rio: [\"10.0.0.1\"]\n  broken: [\"not-an-ip\"]\n",
+        )
+        .expect("parse");
+        let t = c.table();
+        assert_eq!(t.lookup(&crate::wire::Name::from_host("rio")).len(), 1);
+        assert!(t.lookup(&crate::wire::Name::from_host("broken")).is_empty());
+    }
+
+    #[test]
+    fn the_prescribed_table_is_empty_rather_than_baking_in_a_fleet() {
+        assert!(AnnaiConfig::prescribed().names.is_empty());
     }
 
     #[test]
