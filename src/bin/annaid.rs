@@ -21,6 +21,27 @@ fn now_ms() -> u64 {
 }
 
 fn main() -> std::process::ExitCode {
+    // ★ ARGV BEFORE ANYTHING. This daemon ignored `--help` entirely: the flag
+    // fell through, config loaded, the daemon started, and the operator's
+    // question became a running process. Measured 2026-08-29 across all three
+    // of annaid/jikokud/nanorid — convergence, not copying: a daemon whose
+    // whole surface is a shikumi tier ends up with no argument parser at all.
+    //
+    // The gate answers --help/--version and REFUSES an unknown argument
+    // (exit 2, naming it) before any config load, socket bind or side effect.
+    // Refusing an unknown argument matters here because a resolver that
+    // silently ignored `--port 5353` would bind 53 while the operator believed
+    // otherwise — and on a stub resolver that is a fleet-wide DNS outage.
+    let cli = shikumi::daemon::DaemonCli {
+        name: "annaid",
+        version: env!("CARGO_PKG_VERSION"),
+        summary: "the fleet stub resolver — answer from a typed name table, forward the rest",
+        tier_env: "ANNAI_TIER",
+    };
+    if let Some(code) = cli.classify(std::env::args().skip(1)).resolve() {
+        return code;
+    }
+
     let cfg = config::load();
     let table = cfg.table();
 

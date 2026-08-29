@@ -99,7 +99,11 @@ pub struct Resolver<U: Upstream> {
 impl<U: Upstream> Resolver<U> {
     #[must_use]
     pub fn new(table: Table, upstream: U, counters: Arc<AnnaiIntrospect>) -> Self {
-        Self { table, upstream, counters }
+        Self {
+            table,
+            upstream,
+            counters,
+        }
     }
 
     /// Handle one datagram. The whole decision path, socket-free.
@@ -131,7 +135,10 @@ impl<U: Upstream> Resolver<U> {
                         | WireError::ShortHeader { .. }
                         | WireError::NoQuestion
                 ));
-                return Reply::Error { rcode: Rcode::FormatError, id };
+                return Reply::Error {
+                    rcode: Rcode::FormatError,
+                    id,
+                };
             }
         };
 
@@ -148,7 +155,10 @@ impl<U: Upstream> Resolver<U> {
                     // ★ SERVFAIL, NEVER NXDOMAIN. A dead upstream is not
                     // evidence about a name. `Rcode` has no NXDOMAIN variant,
                     // so this cannot regress into one without changing a type.
-                    Err(_) => Reply::Error { rcode: Rcode::ServFail, id: q.id },
+                    Err(_) => Reply::Error {
+                        rcode: Rcode::ServFail,
+                        id: q.id,
+                    },
                 }
             }
         }
@@ -213,7 +223,10 @@ mod tests {
         let r = Resolver::new(table(), Dead, counters());
         assert_eq!(
             r.handle(&query_bytes("nixos.org", 1)),
-            Reply::Error { rcode: Rcode::ServFail, id: 0x1234 }
+            Reply::Error {
+                rcode: Rcode::ServFail,
+                id: 0x1234
+            }
         );
         assert_eq!(Rcode::ServFail.wire(), 2, "RCODE 2, not 3");
     }
@@ -228,7 +241,10 @@ mod tests {
         let r = Resolver::new(table(), spy, counters());
         assert!(matches!(
             r.handle(&buf),
-            Reply::Error { rcode: Rcode::FormatError, .. }
+            Reply::Error {
+                rcode: Rcode::FormatError,
+                ..
+            }
         ));
         assert_eq!(
             r.upstream.0.load(std::sync::atomic::Ordering::Relaxed),
@@ -273,7 +289,10 @@ mod tests {
     fn an_unimplemented_qtype_forwards_rather_than_being_denied() {
         let r = Resolver::new(table(), Echo(vec![7, 7]), counters());
         // MX for a name we DO hold — the name matches, the type does not.
-        assert_eq!(r.handle(&query_bytes("rio", 15)), Reply::Relayed(vec![7, 7]));
+        assert_eq!(
+            r.handle(&query_bytes("rio", 15)),
+            Reply::Relayed(vec![7, 7])
+        );
     }
 
     #[test]
@@ -363,7 +382,11 @@ impl Upstream for UdpUpstream {
             // socket would make the source port predictable across queries,
             // which is half of a cache-poisoning attack. The kernel randomizes
             // an ephemeral bind.
-            let bind = if addr.is_ipv4() { "0.0.0.0:0" } else { "[::]:0" };
+            let bind = if addr.is_ipv4() {
+                "0.0.0.0:0"
+            } else {
+                "[::]:0"
+            };
             let sock = match std::net::UdpSocket::bind(bind) {
                 Ok(s) => s,
                 Err(e) => {
@@ -422,7 +445,10 @@ mod upstream_tests {
 
     #[test]
     fn an_ipv6_upstream_is_bracketed() {
-        assert_eq!(UdpUpstream::new(&["2606:4700:4700::1111".to_owned()]).len(), 1);
+        assert_eq!(
+            UdpUpstream::new(&["2606:4700:4700::1111".to_owned()]).len(),
+            1
+        );
     }
 
     #[test]

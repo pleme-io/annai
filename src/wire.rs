@@ -100,7 +100,10 @@ impl Name {
                 // offset is the minimal infinite loop, and it is equality that
                 // expresses it.
                 if target >= at {
-                    return Err(WireError::NonDecreasingPointer { from: at, to: target });
+                    return Err(WireError::NonDecreasingPointer {
+                        from: at,
+                        to: target,
+                    });
                 }
                 jumps += 1;
                 if jumps > MAX_JUMPS {
@@ -323,7 +326,10 @@ mod tests {
 
     #[test]
     fn the_id_is_preserved_for_the_response() {
-        assert_eq!(Query::parse(&query_bytes("rio", 1)).expect("parse").id, 0x1234);
+        assert_eq!(
+            Query::parse(&query_bytes("rio", 1)).expect("parse").id,
+            0x1234
+        );
     }
 }
 
@@ -401,7 +407,11 @@ mod response_tests {
     use super::*;
 
     fn q(name: &str, qtype: QType) -> Query {
-        Query { id: 0xBEEF, name: Name::from_host(name), qtype }
+        Query {
+            id: 0xBEEF,
+            name: Name::from_host(name),
+            qtype,
+        }
     }
 
     #[test]
@@ -452,7 +462,10 @@ mod response_tests {
     fn an_ipv6_answer_carries_sixteen_octets() {
         let addrs = vec!["fd00::1".parse().expect("ip")];
         let bytes = encode_response(&q("v6", QType::Aaaa), &addrs, true);
-        assert_eq!(bytes[bytes.len() - 18..bytes.len() - 16], 16u16.to_be_bytes());
+        assert_eq!(
+            bytes[bytes.len() - 18..bytes.len() - 16],
+            16u16.to_be_bytes()
+        );
         assert_eq!(bytes.len() - 16, bytes.len() - 16);
     }
 }

@@ -76,7 +76,7 @@
         },
         {
           "name": "shikumi",
-          "package_key": "shikumi-0.1.731",
+          "package_key": "shikumi-0.1.733",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -3089,15 +3089,15 @@
         "preBuild": "export CARGO_CRATE_NAME=serde_yaml;"
       }
     },
-    "shikumi-0.1.731": {
+    "shikumi-0.1.733": {
       "name": "shikumi",
-      "version": "0.1.731",
+      "version": "0.1.733",
       "edition": "2024",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/shikumi/shikumi-0.1.731.crate",
-        "sha256": "b6460524aabeadd6d3fd433f40291d5e4287d0fd02a86e1336217d10c9d64bf4",
-        "name_with_ext": "shikumi-0.1.731.tar.gz"
+        "url": "https://static.crates.io/crates/shikumi/shikumi-0.1.733.crate",
+        "sha256": "05ee7f2bc0bdfb151b6d0916cf9dd74f8bfeb7ce984d0489b6b14f3f51b9a094",
+        "name_with_ext": "shikumi-0.1.733.tar.gz"
       },
       "features": [
         "default"
@@ -3266,7 +3266,7 @@
       },
       "build_rust_crate_args": {
         "crateName": "shikumi",
-        "version": "0.1.731",
+        "version": "0.1.733",
         "edition": "2024",
         "features": [
           "default"
@@ -4826,7 +4826,7 @@
           },
           {
             "name": "shikumi",
-            "package_key": "shikumi-0.1.731",
+            "package_key": "shikumi-0.1.733",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -5990,7 +5990,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "shikumi-0.1.731": {
+      "shikumi-0.1.733": {
         "runtime_dependencies": [
           {
             "name": "arc_swap",
@@ -7949,7 +7949,7 @@
       }
     }
   },
-  "cargo_lock_sha256": "e939e10afb04832bc3990ed94757fe748156d4d066fc022a4314a8c089f32740",
+  "cargo_lock_sha256": "b6ba78216b78678fedf571733a175f8b0aa3dfbad2cd17507d237351b55dceaa",
   "manifest_sha256": {
     "Cargo.toml": "48d480b77614f97ae3c9a962c2eb1f1eeb0f560d2ea33317b7d8777cc02a06ff"
   }

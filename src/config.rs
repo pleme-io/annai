@@ -71,7 +71,10 @@ impl AnnaiConfig {
     pub fn prescribed() -> Self {
         Self {
             listen: Some("127.0.0.1:53".into()),
-            upstreams: PRESCRIBED_UPSTREAMS.iter().map(|s| (*s).to_owned()).collect(),
+            upstreams: PRESCRIBED_UPSTREAMS
+                .iter()
+                .map(|s| (*s).to_owned())
+                .collect(),
             local_ttl: crate::wire::LOCAL_TTL,
             // ★ EMPTY, and that is correct rather than lazy. The prescribed
             // tier is what a node gets with no site configuration, and
@@ -113,9 +116,15 @@ impl AnnaiConfig {
 }
 
 impl shikumi::TieredConfig for AnnaiConfig {
-    fn bare() -> Self { Self::bare() }
-    fn discovered() -> Self { Self::discovered() }
-    fn prescribed_default() -> Self { Self::prescribed() }
+    fn bare() -> Self {
+        Self::bare()
+    }
+    fn discovered() -> Self {
+        Self::discovered()
+    }
+    fn prescribed_default() -> Self {
+        Self::prescribed()
+    }
 }
 
 /// Load through shikumi's discovery chain. Never fails — see the module docs.
@@ -199,16 +208,18 @@ mod tests {
         let c: AnnaiConfig =
             serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\", \"fd00::1\"]\n").expect("parse");
         assert_eq!(c.table().len(), 1);
-        assert_eq!(c.table().lookup(&crate::wire::Name::from_host("rio")).len(), 2);
+        assert_eq!(
+            c.table().lookup(&crate::wire::Name::from_host("rio")).len(),
+            2
+        );
     }
 
     #[test]
     fn one_bad_address_does_not_take_out_the_whole_table() {
         // A typo in one fleet name must not cost resolution for every other.
-        let c: AnnaiConfig = serde_yaml::from_str(
-            "names:\n  rio: [\"10.0.0.1\"]\n  broken: [\"not-an-ip\"]\n",
-        )
-        .expect("parse");
+        let c: AnnaiConfig =
+            serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\"]\n  broken: [\"not-an-ip\"]\n")
+                .expect("parse");
         let t = c.table();
         assert_eq!(t.lookup(&crate::wire::Name::from_host("rio")).len(), 1);
         assert!(t.lookup(&crate::wire::Name::from_host("broken")).is_empty());

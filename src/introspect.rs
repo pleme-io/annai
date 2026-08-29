@@ -103,7 +103,9 @@ impl Introspect for AnnaiIntrospect {
                 "age_ms": now.saturating_sub(self.started_unix_ms),
                 "answered_at_unix_ms": now,
             })),
-            _ => Err(QueryError::UnknownField { field: q.path.join(".") }),
+            _ => Err(QueryError::UnknownField {
+                field: q.path.join("."),
+            }),
         }
     }
 
@@ -117,7 +119,9 @@ mod tests {
     use super::*;
     use crate::wire::Name;
 
-    fn fixed_now() -> u64 { 5_000 }
+    fn fixed_now() -> u64 {
+        5_000
+    }
 
     fn subject() -> Arc<AnnaiIntrospect> {
         let mut t = Table::new();
@@ -186,7 +190,14 @@ mod tests {
 
     #[test]
     fn an_unknown_leaf_is_refused_by_name() {
-        let e = subject().query(&KQuery::field(["nope"])).expect_err("refuse");
-        assert_eq!(e, QueryError::UnknownField { field: "nope".into() });
+        let e = subject()
+            .query(&KQuery::field(["nope"]))
+            .expect_err("refuse");
+        assert_eq!(
+            e,
+            QueryError::UnknownField {
+                field: "nope".into()
+            }
+        );
     }
 }
