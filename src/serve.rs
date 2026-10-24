@@ -22,8 +22,16 @@ use std::sync::Arc;
 
 use crate::decide::Decision;
 use crate::introspect::AnnaiIntrospect;
+use crate::measured::Measured;
 use crate::table::Table;
-use crate::wire::{Query, WireError, encode_response};
+use crate::wire::{Query, Record, WireError, encode_records, encode_response};
+
+#[must_use]
+pub fn system_now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX))
+}
 
 /// The response codes annai itself can mint.
 ///
@@ -94,6 +102,8 @@ pub struct Resolver<U: Upstream> {
     table: Table,
     upstream: U,
     counters: Arc<AnnaiIntrospect>,
+    measured: Arc<Measured>,
+    now: fn() -> u64,
 }
 
 impl<U: Upstream> Resolver<U> {
@@ -103,7 +113,16 @@ impl<U: Upstream> Resolver<U> {
             table,
             upstream,
             counters,
+            measured: Measured::off(),
+            now: system_now_ms,
         }
+    }
+
+    #[must_use]
+    pub fn with_measured(mut self, measured: Arc<Measured>, now: fn() -> u64) -> Self {
+        self.measured = measured;
+        self.now = now;
+        self
     }
 
     /// Handle one datagram. The whole decision path, socket-free.
@@ -142,11 +161,30 @@ impl<U: Upstream> Resolver<U> {
             }
         };
 
-        match Decision::of(&self.table, &q) {
+        let rd = packet.get(2).is_some_and(|b| b & 0x01 != 0);
+        let ttl = self.measured.ttl;
+        let addr_records = |addrs: Vec<std::net::IpAddr>| -> Vec<Record> {
+            addrs.into_iter().map(Record::Addr).collect()
+        };
+        match Decision::resolve(&self.table, &self.measured, &q, (self.now)()) {
             Decision::Answer(addrs) => {
                 self.counters.count_local();
-                let rd = packet.get(2).is_some_and(|b| b & 0x01 != 0);
                 Reply::Local(encode_response(&q, &addrs, rd))
+            }
+            Decision::Measured(addrs) => {
+                self.counters.count_local();
+                self.counters.count_measured();
+                Reply::Local(encode_records(&q, &addr_records(addrs), ttl, rd))
+            }
+            Decision::Fallback(addrs) => {
+                self.counters.count_local();
+                self.counters.count_stale();
+                Reply::Local(encode_records(&q, &addr_records(addrs), ttl, rd))
+            }
+            Decision::Explain(lines) => {
+                self.counters.count_local();
+                let records: Vec<Record> = lines.into_iter().map(Record::Txt).collect();
+                Reply::Local(encode_records(&q, &records, ttl, rd))
             }
             Decision::Forward => {
                 self.counters.count_forwarded();

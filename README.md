@@ -3,12 +3,30 @@
 > "Showing the way." The fleet stub resolver: answer from a typed name table,
 > forward everything else.
 
-## Status — decision core only, NOT a daemon, NOT deployed
+## Status
 
-There is no socket, no upstream client and no cache here. `Decision::Forward`
-names the outcome without performing it. This crate is the tested core that
-re-scopes replacing `dnsmasq` from "reimplement RFC 1035" to something
-finishable.
+`annaid` serves DNS over UDP: it answers from a typed name table and forwards
+everything else to its upstreams. It runs beside dnsmasq for `pleme.internal`
+on nodes with `pleme.fleetDns.zoneResolver` on (nix repo,
+`docs/locality-dns.md`).
+
+### Measured answers (locality DNS, phase 3)
+
+| config field | meaning |
+|---|---|
+| `candidates` | per name: each candidate `{ addr, path: lan\|ts\|pub, rung, port, probe: tcp\|nix-cache, reach: { <from-node>: up\|down\|unknown } }` |
+| `answers` | the file a prober writes (`{ at_ms, from, names: { <name>: { order, why } } }`); unset = measurement off |
+| `node` | this node; answers written by another node are never used |
+| `stale_after_ms` | default 10000; older answers fall back to the static table |
+| `measured_ttl` | default 5; TTL of measured, fallback and TXT answers |
+
+- A/AAAA for a candidate name: the first two addresses of the prober's order
+  when the answers are fresh, else the static table (`names`, or the name's
+  `ts` candidates). A dead prober gives the static answer, never no answer.
+- TXT for a candidate name: one string per candidate, the prober's `why`, or
+  the declared verdicts and the reason the answers are not used.
+- kanshou: `paths` (candidates, answers, freshness) and `counters.measured`,
+  `counters.stale_answers`.
 
 ## Why
 
@@ -46,10 +64,3 @@ the type rather than guarded by a branch someone can later invert. A table
 miss, an unimplemented QTYPE, and a family mismatch all reach `Forward` — the
 last of these because an empty answer is NODATA, which caches exactly like
 NXDOMAIN and suppresses the upstream's real reply.
-
-## Next
-
-Wire as `pleme.fleetDns.mode = "annai"` — the module's own comment already
-invites the variant, and `mode = "none"` is documented as "a local dnsmasq of
-its own". That cutover is a separate, reviewable change: plo's dnsmasq is that
-machine's ONLY resolver.

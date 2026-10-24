@@ -29,16 +29,14 @@
 //!
 //! ── STATUS ─────────────────────────────────────────────────────────────
 //!
-//! **The decision core, tested. Not a daemon and not deployed.** There is no
-//! socket, no upstream client, and no cache here yet; `Decision::Forward` names
-//! the outcome without performing it. Wiring it as `pleme.fleetDns.mode =
-//! "annai"` is the next step and is a separate, reviewable change — plo's
-//! dnsmasq is that machine's ONLY resolver, so the cutover deserves its own
-//! measurement rather than riding in on a library commit.
+//! `annaid` serves the table and forwards the rest; with `candidates` and an
+//! `answers` file it answers from a prober's measured order and falls back to
+//! the table when those answers are stale (`measured`). See README.md.
 
 pub mod config;
 pub mod decide;
 pub mod introspect;
+pub mod measured;
 pub mod serve;
 pub mod table;
 pub mod wire;

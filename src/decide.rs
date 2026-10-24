@@ -29,6 +29,7 @@
 
 use std::net::IpAddr;
 
+use crate::measured::{Freshness, Measured};
 use crate::table::Table;
 use crate::wire::{QType, Query};
 
@@ -39,6 +40,9 @@ pub enum Decision {
     Answer(Vec<IpAddr>),
     /// Send it upstream. The only outcome for anything not held locally.
     Forward,
+    Measured(Vec<IpAddr>),
+    Fallback(Vec<IpAddr>),
+    Explain(Vec<String>),
 }
 
 impl Decision {
@@ -51,7 +55,7 @@ impl Decision {
             // ★ Not a catch-all that could later swallow a type we DO answer:
             // every locally-answerable type is named above, so adding one is a
             // compile-time match arm rather than a silent behaviour change.
-            QType::Other(_) => return Self::Forward,
+            QType::Txt | QType::Other(_) => return Self::Forward,
         };
 
         let addrs: Vec<IpAddr> = table
@@ -70,6 +74,42 @@ impl Decision {
             Self::Forward
         } else {
             Self::Answer(addrs)
+        }
+    }
+
+    #[must_use]
+    pub fn resolve(table: &Table, measured: &Measured, q: &Query, now_ms: u64) -> Self {
+        if measured.candidates.of(&q.name).is_none() {
+            return Self::of(table, q);
+        }
+        let want_v4 = match q.qtype {
+            QType::A => true,
+            QType::Aaaa => false,
+            QType::Txt => {
+                return match measured.explain(&q.name, now_ms) {
+                    Some(why) if !why.is_empty() => Self::Explain(why),
+                    _ => Self::Forward,
+                };
+            }
+            QType::Other(_) => return Self::Forward,
+        };
+        let chosen: Option<Vec<IpAddr>> = measured.with(now_ms, |fresh| match fresh {
+            Freshness::Fresh(a) => a.names.get(q.name.as_str()).map(|n| {
+                n.order
+                    .iter()
+                    .copied()
+                    .filter(|ip| ip.is_ipv4() == want_v4)
+                    .take(2)
+                    .collect()
+            }),
+            _ => None,
+        });
+        match chosen {
+            Some(addrs) if !addrs.is_empty() => Self::Measured(addrs),
+            _ => match Self::of(table, q) {
+                Self::Answer(addrs) => Self::Fallback(addrs),
+                other => other,
+            },
         }
     }
 }
@@ -153,7 +193,7 @@ mod tests {
         // returns `Answer(vec![])` fails here rather than in production as a
         // cached NODATA.
         for name in ["rio", "v6only", "nixos.org", "rio.example.net"] {
-            for t in [QType::A, QType::Aaaa, QType::Other(15)] {
+            for t in [QType::A, QType::Aaaa, QType::Txt, QType::Other(15)] {
                 if let Decision::Answer(a) = Decision::of(&table(), &q(name, t)) {
                     assert!(!a.is_empty(), "{name} {t:?} produced an empty Answer");
                 }
@@ -167,5 +207,112 @@ mod tests {
             Decision::of(&table(), &q("RIO.Example.Net", QType::A)),
             Decision::Answer(vec!["192.0.2.66".parse().expect("ip")])
         );
+    }
+
+    mod measured {
+        use super::*;
+        use crate::measured::{Answers, Candidates, Measured};
+
+        fn m() -> std::sync::Arc<Measured> {
+            let raw = serde_yaml::from_str(
+                "cid.pleme.internal:\n  - { addr: 192.168.60.138, path: lan, rung: 1, port: 22 }\n  - { addr: 100.104.30.81, path: ts, rung: 2, port: 22 }\n",
+            )
+            .expect("parse");
+            Measured::new(
+                Candidates::from_config(&raw),
+                Some("ryn".into()),
+                10_000,
+                5,
+                Some("/nonexistent".into()),
+            )
+        }
+
+        fn t() -> Table {
+            let mut t = Table::new();
+            t.insert(
+                Name::from_host("cid.pleme.internal"),
+                "100.104.30.81".parse().expect("ip"),
+            );
+            t.insert(Name::from_host("rio"), "192.0.2.66".parse().expect("ip"));
+            t
+        }
+
+        fn answers(at_ms: u64, order: &[&str]) -> Answers {
+            Answers {
+                at_ms,
+                from: "ryn".into(),
+                names: [(
+                    "cid.pleme.internal".to_owned(),
+                    crate::measured::NamedAnswer {
+                        order: order.iter().map(|a| a.parse().expect("ip")).collect(),
+                        why: vec!["path=lan chosen=yes".into()],
+                    },
+                )]
+                .into(),
+            }
+        }
+
+        #[test]
+        fn fresh_answers_choose_the_order() {
+            let m = m();
+            m.store(answers(1_000, &["192.168.60.138", "100.104.30.81"]));
+            assert_eq!(
+                Decision::resolve(&t(), &m, &q("cid.pleme.internal", QType::A), 2_000),
+                Decision::Measured(vec![
+                    "192.168.60.138".parse().expect("ip"),
+                    "100.104.30.81".parse().expect("ip")
+                ])
+            );
+        }
+
+        #[test]
+        fn stale_answers_fall_back_to_the_static_table() {
+            let m = m();
+            m.store(answers(1_000, &["192.168.60.138"]));
+            assert_eq!(
+                Decision::resolve(&t(), &m, &q("cid.pleme.internal", QType::A), 20_000),
+                Decision::Fallback(vec!["100.104.30.81".parse().expect("ip")])
+            );
+        }
+
+        #[test]
+        fn no_answers_yet_is_the_static_table_never_a_refusal() {
+            assert_eq!(
+                Decision::resolve(&t(), &m(), &q("cid.pleme.internal", QType::A), 0),
+                Decision::Fallback(vec!["100.104.30.81".parse().expect("ip")])
+            );
+        }
+
+        #[test]
+        fn a_name_without_candidates_is_the_table_as_before() {
+            assert_eq!(
+                Decision::resolve(&t(), &m(), &q("rio", QType::A), 0),
+                Decision::Answer(vec!["192.0.2.66".parse().expect("ip")])
+            );
+            assert_eq!(
+                Decision::resolve(&t(), &m(), &q("rio", QType::Txt), 0),
+                Decision::Forward
+            );
+        }
+
+        #[test]
+        fn txt_explains_a_candidate_name() {
+            let m = m();
+            m.store(answers(1_000, &["192.168.60.138"]));
+            assert_eq!(
+                Decision::resolve(&t(), &m, &q("cid.pleme.internal", QType::Txt), 1_000),
+                Decision::Explain(vec!["path=lan chosen=yes".into()])
+            );
+        }
+
+        #[test]
+        fn a_family_with_no_measured_address_falls_back_rather_than_answering_empty() {
+            let m = m();
+            m.store(answers(1_000, &["192.168.60.138"]));
+            assert_eq!(
+                Decision::resolve(&t(), &m, &q("cid.pleme.internal", QType::Aaaa), 1_000),
+                Decision::Forward
+            );
+        }
     }
 }

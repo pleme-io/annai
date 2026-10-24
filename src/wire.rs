@@ -165,6 +165,7 @@ pub enum QType {
     A,
     /// IPv6 host address.
     Aaaa,
+    Txt,
     /// Anything we do not answer locally.
     Other(u16),
 }
@@ -175,6 +176,7 @@ impl QType {
         match v {
             1 => Self::A,
             28 => Self::Aaaa,
+            16 => Self::Txt,
             other => Self::Other(other),
         }
     }
@@ -353,6 +355,19 @@ pub const LOCAL_TTL: u32 = 30;
 /// and this is the test that proves it does not.
 #[must_use]
 pub fn encode_response(q: &Query, addrs: &[std::net::IpAddr], recursion_desired: bool) -> Vec<u8> {
+    let records: Vec<Record> = addrs.iter().copied().map(Record::Addr).collect();
+    encode_records(q, &records, LOCAL_TTL, recursion_desired)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Record {
+    Addr(std::net::IpAddr),
+    Txt(String),
+}
+
+#[must_use]
+pub fn encode_records(q: &Query, records: &[Record], ttl: u32, recursion_desired: bool) -> Vec<u8> {
+    let addrs = records;
     let mut out = Vec::with_capacity(64);
     out.extend_from_slice(&q.id.to_be_bytes());
 
@@ -375,6 +390,7 @@ pub fn encode_response(q: &Query, addrs: &[std::net::IpAddr], recursion_desired:
     let qtype: u16 = match q.qtype {
         QType::A => 1,
         QType::Aaaa => 28,
+        QType::Txt => 16,
         QType::Other(v) => v,
     };
     out.extend_from_slice(&qtype.to_be_bytes());
@@ -382,22 +398,29 @@ pub fn encode_response(q: &Query, addrs: &[std::net::IpAddr], recursion_desired:
 
     for addr in addrs {
         out.extend_from_slice(&[0xC0, 0x0C]); // name → the question, backward
-        match addr {
-            std::net::IpAddr::V4(v4) => {
-                out.extend_from_slice(&1u16.to_be_bytes());
-                out.extend_from_slice(&1u16.to_be_bytes());
-                out.extend_from_slice(&LOCAL_TTL.to_be_bytes());
-                out.extend_from_slice(&4u16.to_be_bytes());
-                out.extend_from_slice(&v4.octets());
-            }
-            std::net::IpAddr::V6(v6) => {
-                out.extend_from_slice(&28u16.to_be_bytes());
-                out.extend_from_slice(&1u16.to_be_bytes());
-                out.extend_from_slice(&LOCAL_TTL.to_be_bytes());
-                out.extend_from_slice(&16u16.to_be_bytes());
-                out.extend_from_slice(&v6.octets());
-            }
-        }
+        let (rtype, rdata): (u16, Vec<u8>) = match addr {
+            Record::Addr(std::net::IpAddr::V4(v4)) => (1, v4.octets().to_vec()),
+            Record::Addr(std::net::IpAddr::V6(v6)) => (28, v6.octets().to_vec()),
+            Record::Txt(text) => (16, txt_rdata(text)),
+        };
+        out.extend_from_slice(&rtype.to_be_bytes());
+        out.extend_from_slice(&1u16.to_be_bytes());
+        out.extend_from_slice(&ttl.to_be_bytes());
+        out.extend_from_slice(&u16::try_from(rdata.len()).unwrap_or(u16::MAX).to_be_bytes());
+        out.extend_from_slice(&rdata);
+    }
+    out
+}
+
+fn txt_rdata(text: &str) -> Vec<u8> {
+    let bytes = text.as_bytes();
+    let mut out = Vec::with_capacity(bytes.len() + bytes.len() / 255 + 1);
+    if bytes.is_empty() {
+        out.push(0);
+    }
+    for chunk in bytes.chunks(255) {
+        out.push(u8::try_from(chunk.len()).unwrap_or(u8::MAX));
+        out.extend_from_slice(chunk);
     }
     out
 }
@@ -467,5 +490,27 @@ mod response_tests {
             16u16.to_be_bytes()
         );
         assert_eq!(bytes.len() - 16, bytes.len() - 16);
+    }
+
+    #[test]
+    fn a_txt_answer_is_length_prefixed_and_split_at_255() {
+        let long = "x".repeat(300);
+        let bytes = encode_records(&q("cid", QType::Txt), &[Record::Txt(long)], 5, true);
+        let rdlen =
+            u16::from_be_bytes([bytes[bytes.len() - 302 - 2], bytes[bytes.len() - 302 - 1]]);
+        assert_eq!(rdlen, 302);
+        assert_eq!(bytes[bytes.len() - 302], 255);
+        assert_eq!(bytes[bytes.len() - 302 + 256], 45);
+    }
+
+    #[test]
+    fn the_ttl_is_the_callers() {
+        let addrs = [Record::Addr("10.0.0.1".parse().expect("ip"))];
+        let bytes = encode_records(&q("cid", QType::A), &addrs, 5, true);
+        let ttl_at = bytes.len() - 4 - 2 - 4;
+        assert_eq!(
+            u32::from_be_bytes(bytes[ttl_at..ttl_at + 4].try_into().expect("4")),
+            5
+        );
     }
 }

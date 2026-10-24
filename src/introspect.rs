@@ -19,6 +19,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use kanshou::{Introspect, Query as KQuery, QueryError, QueryResult};
 
+use crate::measured::Measured;
 use crate::table::Table;
 
 /// Live counters plus the table, as the daemon's askable state.
@@ -27,6 +28,9 @@ pub struct AnnaiIntrospect {
     local: AtomicU64,
     forwarded: AtomicU64,
     refused: AtomicU64,
+    measured: AtomicU64,
+    stale_answers: AtomicU64,
+    paths: Arc<Measured>,
     started_unix_ms: u64,
     now: fn() -> u64,
 }
@@ -34,14 +38,35 @@ pub struct AnnaiIntrospect {
 impl AnnaiIntrospect {
     #[must_use]
     pub fn new(table: Table, started_unix_ms: u64, now: fn() -> u64) -> Arc<Self> {
+        Self::with_paths(table, Measured::off(), started_unix_ms, now)
+    }
+
+    #[must_use]
+    pub fn with_paths(
+        table: Table,
+        paths: Arc<Measured>,
+        started_unix_ms: u64,
+        now: fn() -> u64,
+    ) -> Arc<Self> {
         Arc::new(Self {
             table,
             local: AtomicU64::new(0),
             forwarded: AtomicU64::new(0),
             refused: AtomicU64::new(0),
+            measured: AtomicU64::new(0),
+            stale_answers: AtomicU64::new(0),
+            paths,
             started_unix_ms,
             now,
         })
+    }
+
+    pub fn count_measured(&self) {
+        self.measured.fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub fn count_stale(&self) {
+        self.stale_answers.fetch_add(1, Ordering::Relaxed);
     }
 
     /// Record one query answered from the local table.
@@ -78,6 +103,8 @@ impl Introspect for AnnaiIntrospect {
                     "local": local,
                     "forwarded": forwarded,
                     "refused": self.refused.load(Ordering::Relaxed),
+                    "measured": self.measured.load(Ordering::Relaxed),
+                    "stale_answers": self.stale_answers.load(Ordering::Relaxed),
                     // The ratio is the health signal; computed here so every
                     // consumer reads the same definition of it.
                     // ★ The ratio as an EXACT rational, not a float. The f64
@@ -98,6 +125,7 @@ impl Introspect for AnnaiIntrospect {
                     "answered_at_unix_ms": now,
                 }))
             }
+            ["paths"] => Ok(self.paths.paths(now)),
             ["uptime"] => Ok(serde_json::json!({
                 "started_unix_ms": self.started_unix_ms,
                 "age_ms": now.saturating_sub(self.started_unix_ms),
@@ -110,7 +138,7 @@ impl Introspect for AnnaiIntrospect {
     }
 
     fn schema(&self) -> &'static [&'static str] {
-        &["table", "counters", "uptime"]
+        &["table", "counters", "paths", "uptime"]
     }
 }
 

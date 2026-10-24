@@ -3,10 +3,8 @@
 //! Loads its typed config, builds the name table from the fleet registry,
 //! publishes a kanshou surface, and serves DNS over UDP.
 //!
-//! ★ NOT DEPLOYED ANYWHERE. On a node where annai is the only resolver, the
-//! cutover takes that machine's entire name resolution with it, so it is a
-//! deliberate separate change gated on its own measurement — see the crate
-//! docs and `theory/NATURALIZE-NIXOS.md`.
+//! Deployed by the nix repo's `pleme.fleetDns` (`zoneResolver` beside dnsmasq,
+//! or `annai` mode as the node's only resolver).
 
 use std::sync::Arc;
 
@@ -60,7 +58,10 @@ fn main() -> std::process::ExitCode {
         }
     };
 
-    let counters = AnnaiIntrospect::new(table.clone(), now_ms(), now_ms);
+    let measured = cfg.measured();
+    annai::measured::watch(&measured);
+    let counters =
+        AnnaiIntrospect::with_paths(table.clone(), Arc::clone(&measured), now_ms(), now_ms);
     match kanshou::Server::spawn_sidecar("annai", Arc::clone(&counters)) {
         Some(p) => eprintln!("annai: introspection live at {}", p.display()),
         None => eprintln!("annai: introspection unavailable — resolution still works"),
@@ -72,7 +73,7 @@ fn main() -> std::process::ExitCode {
         // everything it asks for is a legitimate, if unusual, configuration.
         eprintln!("annai: no usable upstream — only names in the table will resolve");
     }
-    let resolver = Resolver::new(table, upstream, counters);
+    let resolver = Resolver::new(table, upstream, counters).with_measured(measured, now_ms);
 
     eprintln!("annai: listening on {listen}");
     let mut buf = vec![0u8; annai::serve::MAX_REPLY];

@@ -44,6 +44,11 @@ pub struct AnnaiConfig {
     /// read `/etc/hosts` because nothing could hand it a registry — annai can
     /// be handed one.
     pub names: std::collections::BTreeMap<String, Vec<String>>,
+    pub candidates: std::collections::BTreeMap<String, Vec<crate::measured::Candidate>>,
+    pub answers: Option<String>,
+    pub node: Option<String>,
+    pub stale_after_ms: u64,
+    pub measured_ttl: u32,
 }
 
 impl AnnaiConfig {
@@ -55,6 +60,11 @@ impl AnnaiConfig {
             upstreams: Vec::new(),
             local_ttl: 0,
             names: std::collections::BTreeMap::new(),
+            candidates: std::collections::BTreeMap::new(),
+            answers: None,
+            node: None,
+            stale_after_ms: crate::measured::DEFAULT_STALE_AFTER_MS,
+            measured_ttl: crate::measured::DEFAULT_MEASURED_TTL,
         }
     }
 
@@ -82,6 +92,11 @@ impl AnnaiConfig {
             // the binary. An empty table forwards everything, which is a
             // working resolver -- just not a fleet-aware one.
             names: std::collections::BTreeMap::new(),
+            candidates: std::collections::BTreeMap::new(),
+            answers: None,
+            node: None,
+            stale_after_ms: crate::measured::DEFAULT_STALE_AFTER_MS,
+            measured_ttl: crate::measured::DEFAULT_MEASURED_TTL,
         }
     }
 }
@@ -111,7 +126,29 @@ impl AnnaiConfig {
                 }
             }
         }
+        for (name, cs) in &self.candidates {
+            if self.names.contains_key(name) {
+                continue;
+            }
+            for c in cs
+                .iter()
+                .filter(|c| c.path == crate::measured::PathKind::Ts)
+            {
+                t.insert(crate::wire::Name::from_host(name), c.addr);
+            }
+        }
         t
+    }
+
+    #[must_use]
+    pub fn measured(&self) -> std::sync::Arc<crate::measured::Measured> {
+        crate::measured::Measured::new(
+            crate::measured::Candidates::from_config(&self.candidates),
+            self.node.clone(),
+            self.stale_after_ms,
+            self.measured_ttl,
+            self.answers.as_ref().map(std::path::PathBuf::from),
+        )
     }
 }
 
@@ -235,5 +272,33 @@ mod tests {
         let c = AnnaiConfig::prescribed();
         let s = serde_yaml::to_string(&c).expect("ser");
         assert_eq!(serde_yaml::from_str::<AnnaiConfig>(&s).expect("de"), c);
+    }
+
+    #[test]
+    fn candidates_parse_and_a_candidate_only_name_falls_back_to_its_tailnet_address() {
+        let c: AnnaiConfig = serde_yaml::from_str(
+            "node: ryn\nanswers: /var/run/annai/answers.json\ncandidates:\n  cid.pleme.internal:\n    - { addr: 192.168.60.138, path: lan, rung: 1, port: 22, reach: { ryn: up, cid: down } }\n    - { addr: 100.104.30.81, path: ts, rung: 2, port: 22 }\n  cache-darwin.pleme.internal:\n    - { addr: 192.168.60.138, path: lan, rung: 1, port: 5001, probe: nix-cache }\n",
+        )
+        .expect("parse");
+        assert_eq!(c.stale_after_ms, 10_000);
+        assert_eq!(c.measured_ttl, 5);
+        let t = c.table();
+        assert_eq!(
+            t.lookup(&crate::wire::Name::from_host("cid.pleme.internal")),
+            &["100.104.30.81".parse::<std::net::IpAddr>().expect("ip")]
+        );
+        assert!(
+            t.lookup(&crate::wire::Name::from_host("cache-darwin.pleme.internal"))
+                .is_empty()
+        );
+        assert_eq!(c.measured().candidates.len(), 2);
+    }
+
+    #[test]
+    fn a_config_without_candidates_still_parses_as_before() {
+        let c: AnnaiConfig =
+            serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\"]\n").expect("parse");
+        assert!(c.candidates.is_empty());
+        assert!(c.answers.is_none());
     }
 }
