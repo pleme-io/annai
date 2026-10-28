@@ -322,7 +322,7 @@ mod tests {
     use super::*;
 
     fn cid() -> BTreeMap<String, Vec<Candidate>> {
-        serde_yaml::from_str(
+        serde_norway::from_str(
             "cid.pleme.internal:\n  - { addr: 100.104.30.81, path: ts, rung: 2, port: 22 }\n  - { addr: 192.168.60.138, path: lan, rung: 1, port: 22, reach: { ryn: up } }\n",
         )
         .expect("parse")
@@ -356,7 +356,7 @@ mod tests {
     #[test]
     fn an_unknown_candidate_field_is_refused() {
         assert!(
-            serde_yaml::from_str::<Candidate>(
+            serde_norway::from_str::<Candidate>(
                 "{ addr: 10.0.0.1, path: lan, rung: 1, port: 22, speed: 9 }"
             )
             .is_err()

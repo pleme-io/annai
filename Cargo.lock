@@ -18,7 +18,7 @@ dependencies = [
  "kanshou",
  "serde",
  "serde_json",
- "serde_yaml",
+ "serde_norway",
  "shikumi",
 ]
 
@@ -152,6 +152,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn-clone"
+version = "1.0.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
+
+[[package]]
 name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -166,7 +172,6 @@ dependencies = [
  "atomic",
  "pear",
  "serde",
- "serde_yaml",
  "toml",
  "uncased",
  "version_check",
@@ -213,9 +218,9 @@ dependencies = [
 
 [[package]]
 name = "gen-macros"
-version = "0.1.48"
+version = "0.1.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76f569af73a982a3f3617448e3116235692b635e7ff40dcdfbb4b1c0ccd07faf"
+checksum = "522e8f4d0f4af82ee13c37507c12907c0587a982f8a17c8b378b14ae81ac24c8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -224,9 +229,9 @@ dependencies = [
 
 [[package]]
 name = "gen-platform"
-version = "0.1.48"
+version = "0.1.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d2e881d0fe7758fa3f66ee7c5e34b6d1f3c0394bce214e4c620534e6c65e29f"
+checksum = "c2626761d01e0f872bb5ab92aa45fcfd1f820904a4da36f96b1b9a101ffa44fd"
 dependencies = [
  "gen-macros",
  "gen-types",
@@ -238,9 +243,9 @@ dependencies = [
 
 [[package]]
 name = "gen-types"
-version = "0.1.48"
+version = "0.1.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9afe68a5ea6c3a74e4ed718b6a3cf8139bb19251a2772ece13b5689f13b1d9e5"
+checksum = "f6d5dd9f013ffd978542607400199cf39f3fdff3feb36e52d13a4f7c20b6b0bd"
 dependencies = [
  "blake3",
  "chrono",
@@ -530,6 +535,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "ref-cast"
+version = "1.0.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e440fb4e4b4147295338efb76001ab9e4efc0e5839df2c47fc5ac2381d365c3"
+dependencies = [
+ "ref-cast-impl",
+]
+
+[[package]]
+name = "ref-cast-impl"
+version = "1.0.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92ecd8964f8453721699a1ed72037b0db49ce2f5a5138486ee89bed6f67cdf3a"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.9",
+]
+
+[[package]]
 name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -548,6 +573,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "schemars"
+version = "1.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab508826f74a77ca9d5aba6ff19b522583ee3eaf28a19384ff3d0e5835fadf6e"
+dependencies = [
+ "dyn-clone",
+ "ref-cast",
+ "schemars_derive",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "schemars_derive"
+version = "1.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1c3a92094fa7d61aa124645844facb6b554dfc797136d0f5fd1f890e2bffc69"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde_derive_internals",
+ "syn 3.0.9",
 ]
 
 [[package]]
@@ -581,6 +631,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_derive_internals"
+version = "0.30.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f852137cce035d6a4df67ccce505ff6b3e9fd3a10e3e52b24dc71e650bb1a9bd"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.9",
+]
+
+[[package]]
 name = "serde_json"
 version = "1.0.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -594,6 +655,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_norway"
+version = "0.9.42"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e408f29489b5fd500fab51ff1484fc859bb655f32c671f307dcd733b72e8168c"
+dependencies = [
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
+ "unsafe-libyaml-norway",
+]
+
+[[package]]
 name = "serde_spanned"
 version = "0.6.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -603,23 +677,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_yaml"
-version = "0.9.34+deprecated"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
-dependencies = [
- "indexmap",
- "itoa",
- "ryu",
- "serde",
- "unsafe-libyaml",
-]
-
-[[package]]
 name = "shikumi"
-version = "0.1.733"
+version = "0.1.1084"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05ee7f2bc0bdfb151b6d0916cf9dd74f8bfeb7ce984d0489b6b14f3f51b9a094"
+checksum = "d340f2caa2bc6c020e7223bc89cd330687a9dd2aacdcfe6686f46ba1339ea1c1"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -627,9 +688,10 @@ dependencies = [
  "gen-platform",
  "gen-types",
  "notify",
+ "schemars",
  "serde",
  "serde_json",
- "serde_yaml",
+ "serde_norway",
  "thiserror",
  "tracing",
 ]
@@ -812,10 +874,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
 
 [[package]]
-name = "unsafe-libyaml"
-version = "0.2.11"
+name = "unsafe-libyaml-norway"
+version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
+checksum = "b39abd59bf32521c7f2301b52d05a6a2c975b6003521cbd0c6dc1582f0a22104"
 
 [[package]]
 name = "version_check"

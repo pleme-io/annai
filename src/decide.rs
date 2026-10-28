@@ -214,7 +214,7 @@ mod tests {
         use crate::measured::{Answers, Candidates, Measured};
 
         fn m() -> std::sync::Arc<Measured> {
-            let raw = serde_yaml::from_str(
+            let raw = serde_norway::from_str(
                 "cid.pleme.internal:\n  - { addr: 192.168.60.138, path: lan, rung: 1, port: 22 }\n  - { addr: 100.104.30.81, path: ts, rung: 2, port: 22 }\n",
             )
             .expect("parse");

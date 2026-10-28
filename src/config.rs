@@ -237,13 +237,13 @@ mod tests {
 
     #[test]
     fn a_typo_is_rejected_rather_than_ignored() {
-        assert!(serde_yaml::from_str::<AnnaiConfig>("upstream: [1.1.1.1]\n").is_err());
+        assert!(serde_norway::from_str::<AnnaiConfig>("upstream: [1.1.1.1]\n").is_err());
     }
 
     #[test]
     fn the_table_is_built_from_the_typed_registry() {
         let c: AnnaiConfig =
-            serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\", \"fd00::1\"]\n").expect("parse");
+            serde_norway::from_str("names:\n  rio: [\"10.0.0.1\", \"fd00::1\"]\n").expect("parse");
         assert_eq!(c.table().len(), 1);
         assert_eq!(
             c.table().lookup(&crate::wire::Name::from_host("rio")).len(),
@@ -255,7 +255,7 @@ mod tests {
     fn one_bad_address_does_not_take_out_the_whole_table() {
         // A typo in one fleet name must not cost resolution for every other.
         let c: AnnaiConfig =
-            serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\"]\n  broken: [\"not-an-ip\"]\n")
+            serde_norway::from_str("names:\n  rio: [\"10.0.0.1\"]\n  broken: [\"not-an-ip\"]\n")
                 .expect("parse");
         let t = c.table();
         assert_eq!(t.lookup(&crate::wire::Name::from_host("rio")).len(), 1);
@@ -270,13 +270,13 @@ mod tests {
     #[test]
     fn the_config_round_trips() {
         let c = AnnaiConfig::prescribed();
-        let s = serde_yaml::to_string(&c).expect("ser");
-        assert_eq!(serde_yaml::from_str::<AnnaiConfig>(&s).expect("de"), c);
+        let s = serde_norway::to_string(&c).expect("ser");
+        assert_eq!(serde_norway::from_str::<AnnaiConfig>(&s).expect("de"), c);
     }
 
     #[test]
     fn candidates_parse_and_a_candidate_only_name_falls_back_to_its_tailnet_address() {
-        let c: AnnaiConfig = serde_yaml::from_str(
+        let c: AnnaiConfig = serde_norway::from_str(
             "node: ryn\nanswers: /var/run/annai/answers.json\ncandidates:\n  cid.pleme.internal:\n    - { addr: 192.168.60.138, path: lan, rung: 1, port: 22, reach: { ryn: up, cid: down } }\n    - { addr: 100.104.30.81, path: ts, rung: 2, port: 22 }\n  cache-darwin.pleme.internal:\n    - { addr: 192.168.60.138, path: lan, rung: 1, port: 5001, probe: nix-cache }\n",
         )
         .expect("parse");
@@ -297,7 +297,7 @@ mod tests {
     #[test]
     fn a_config_without_candidates_still_parses_as_before() {
         let c: AnnaiConfig =
-            serde_yaml::from_str("names:\n  rio: [\"10.0.0.1\"]\n").expect("parse");
+            serde_norway::from_str("names:\n  rio: [\"10.0.0.1\"]\n").expect("parse");
         assert!(c.candidates.is_empty());
         assert!(c.answers.is_none());
     }

@@ -65,8 +65,8 @@
           "tree": "target"
         },
         {
-          "name": "serde_yaml",
-          "package_key": "serde_yaml-0.9.34+deprecated",
+          "name": "serde_norway",
+          "package_key": "serde_norway-0.9.42",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -76,7 +76,7 @@
         },
         {
           "name": "shikumi",
-          "package_key": "shikumi-0.1.733",
+          "package_key": "shikumi-0.1.1084",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -722,6 +722,33 @@
         "preBuild": "export CARGO_CRATE_NAME=cpufeatures;"
       }
     },
+    "dyn-clone-1.0.20": {
+      "name": "dyn-clone",
+      "version": "1.0.20",
+      "edition": "2018",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/dyn-clone/dyn-clone-1.0.20.crate",
+        "sha256": "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555",
+        "name_with_ext": "dyn-clone-1.0.20.tar.gz"
+      },
+      "features": [],
+      "proc_macro": false,
+      "build_script": null,
+      "links": null,
+      "binaries": [],
+      "lib_target": null,
+      "runtime_dependencies": [],
+      "build_dependencies": [],
+      "crate_renames": {},
+      "build_rust_crate_args": {
+        "crateName": "dyn-clone",
+        "version": "1.0.20",
+        "edition": "2018",
+        "release": true,
+        "preBuild": "export CARGO_CRATE_NAME=dyn_clone;"
+      }
+    },
     "equivalent-1.0.2": {
       "name": "equivalent",
       "version": "1.0.2",
@@ -763,9 +790,7 @@
         "env",
         "parse-value",
         "pear",
-        "serde_yaml",
-        "toml",
-        "yaml"
+        "toml"
       ],
       "proc_macro": false,
       "build_script": "build.rs",
@@ -790,16 +815,6 @@
           "features": [],
           "uses_default_features": true,
           "optional": false,
-          "target": null,
-          "tree": "target"
-        },
-        {
-          "name": "serde_yaml",
-          "package_key": "serde_yaml-0.9.34+deprecated",
-          "kind": "normal",
-          "features": [],
-          "uses_default_features": true,
-          "optional": true,
           "target": null,
           "tree": "target"
         },
@@ -845,9 +860,7 @@
           "env",
           "parse-value",
           "pear",
-          "serde_yaml",
-          "toml",
-          "yaml"
+          "toml"
         ],
         "release": true,
         "build": "build.rs",
@@ -919,15 +932,15 @@
         "preBuild": "export CARGO_CRATE_NAME=fsevent_sys;"
       }
     },
-    "gen-macros-0.1.48": {
+    "gen-macros-0.1.55": {
       "name": "gen-macros",
-      "version": "0.1.48",
+      "version": "0.1.55",
       "edition": "2024",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/gen-macros/gen-macros-0.1.48.crate",
-        "sha256": "76f569af73a982a3f3617448e3116235692b635e7ff40dcdfbb4b1c0ccd07faf",
-        "name_with_ext": "gen-macros-0.1.48.tar.gz"
+        "url": "https://static.crates.io/crates/gen-macros/gen-macros-0.1.55.crate",
+        "sha256": "522e8f4d0f4af82ee13c37507c12907c0587a982f8a17c8b378b14ae81ac24c8",
+        "name_with_ext": "gen-macros-0.1.55.tar.gz"
       },
       "features": [],
       "proc_macro": true,
@@ -981,7 +994,7 @@
       },
       "build_rust_crate_args": {
         "crateName": "gen-macros",
-        "version": "0.1.48",
+        "version": "0.1.55",
         "edition": "2024",
         "crateRenames": {
           "proc-macro2": [
@@ -996,15 +1009,15 @@
         "preBuild": "export CARGO_CRATE_NAME=gen_macros;"
       }
     },
-    "gen-platform-0.1.48": {
+    "gen-platform-0.1.55": {
       "name": "gen-platform",
-      "version": "0.1.48",
+      "version": "0.1.55",
       "edition": "2024",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/gen-platform/gen-platform-0.1.48.crate",
-        "sha256": "5d2e881d0fe7758fa3f66ee7c5e34b6d1f3c0394bce214e4c620534e6c65e29f",
-        "name_with_ext": "gen-platform-0.1.48.tar.gz"
+        "url": "https://static.crates.io/crates/gen-platform/gen-platform-0.1.55.crate",
+        "sha256": "c2626761d01e0f872bb5ab92aa45fcfd1f820904a4da36f96b1b9a101ffa44fd",
+        "name_with_ext": "gen-platform-0.1.55.tar.gz"
       },
       "features": [],
       "proc_macro": false,
@@ -1015,7 +1028,7 @@
       "runtime_dependencies": [
         {
           "name": "gen_macros",
-          "package_key": "gen-macros-0.1.48",
+          "package_key": "gen-macros-0.1.55",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -1025,7 +1038,7 @@
         },
         {
           "name": "gen_types",
-          "package_key": "gen-types-0.1.48",
+          "package_key": "gen-types-0.1.55",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -1080,31 +1093,31 @@
       "crate_renames": {
         "gen-macros": [
           {
-            "version": "0.1.48",
+            "version": "0.1.55",
             "rename": "gen_macros"
           }
         ],
         "gen-types": [
           {
-            "version": "0.1.48",
+            "version": "0.1.55",
             "rename": "gen_types"
           }
         ]
       },
       "build_rust_crate_args": {
         "crateName": "gen-platform",
-        "version": "0.1.48",
+        "version": "0.1.55",
         "edition": "2024",
         "crateRenames": {
           "gen-macros": [
             {
-              "version": "0.1.48",
+              "version": "0.1.55",
               "rename": "gen_macros"
             }
           ],
           "gen-types": [
             {
-              "version": "0.1.48",
+              "version": "0.1.55",
               "rename": "gen_types"
             }
           ]
@@ -1113,15 +1126,15 @@
         "preBuild": "export CARGO_CRATE_NAME=gen_platform;"
       }
     },
-    "gen-types-0.1.48": {
+    "gen-types-0.1.55": {
       "name": "gen-types",
-      "version": "0.1.48",
+      "version": "0.1.55",
       "edition": "2024",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/gen-types/gen-types-0.1.48.crate",
-        "sha256": "9afe68a5ea6c3a74e4ed718b6a3cf8139bb19251a2772ece13b5689f13b1d9e5",
-        "name_with_ext": "gen-types-0.1.48.tar.gz"
+        "url": "https://static.crates.io/crates/gen-types/gen-types-0.1.55.crate",
+        "sha256": "f6d5dd9f013ffd978542607400199cf39f3fdff3feb36e52d13a4f7c20b6b0bd",
+        "name_with_ext": "gen-types-0.1.55.tar.gz"
       },
       "features": [],
       "proc_macro": false,
@@ -1211,7 +1224,7 @@
       "crate_renames": {},
       "build_rust_crate_args": {
         "crateName": "gen-types",
-        "version": "0.1.48",
+        "version": "0.1.55",
         "edition": "2024",
         "release": true,
         "preBuild": "export CARGO_CRATE_NAME=gen_types;"
@@ -2608,6 +2621,134 @@
         "preBuild": "export CARGO_CRATE_NAME=quote;"
       }
     },
+    "ref-cast-1.0.27": {
+      "name": "ref-cast",
+      "version": "1.0.27",
+      "edition": "2021",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/ref-cast/ref-cast-1.0.27.crate",
+        "sha256": "7e440fb4e4b4147295338efb76001ab9e4efc0e5839df2c47fc5ac2381d365c3",
+        "name_with_ext": "ref-cast-1.0.27.tar.gz"
+      },
+      "features": [],
+      "proc_macro": false,
+      "build_script": "build.rs",
+      "links": null,
+      "binaries": [],
+      "lib_target": null,
+      "runtime_dependencies": [
+        {
+          "name": "ref_cast_impl",
+          "package_key": "ref-cast-impl-1.0.27",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "host"
+        }
+      ],
+      "build_dependencies": [],
+      "crate_renames": {
+        "ref-cast-impl": [
+          {
+            "version": "1.0.27",
+            "rename": "ref_cast_impl"
+          }
+        ]
+      },
+      "build_rust_crate_args": {
+        "crateName": "ref-cast",
+        "version": "1.0.27",
+        "edition": "2021",
+        "crateRenames": {
+          "ref-cast-impl": [
+            {
+              "version": "1.0.27",
+              "rename": "ref_cast_impl"
+            }
+          ]
+        },
+        "release": true,
+        "build": "build.rs",
+        "preBuild": "export CARGO_CRATE_NAME=ref_cast;"
+      }
+    },
+    "ref-cast-impl-1.0.27": {
+      "name": "ref-cast-impl",
+      "version": "1.0.27",
+      "edition": "2021",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/ref-cast-impl/ref-cast-impl-1.0.27.crate",
+        "sha256": "92ecd8964f8453721699a1ed72037b0db49ce2f5a5138486ee89bed6f67cdf3a",
+        "name_with_ext": "ref-cast-impl-1.0.27.tar.gz"
+      },
+      "features": [],
+      "proc_macro": true,
+      "build_script": null,
+      "links": null,
+      "binaries": [],
+      "lib_target": null,
+      "runtime_dependencies": [
+        {
+          "name": "proc_macro2",
+          "package_key": "proc-macro2-1.0.107",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "quote",
+          "package_key": "quote-1.0.47",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "syn",
+          "package_key": "syn-3.0.9",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        }
+      ],
+      "build_dependencies": [],
+      "crate_renames": {
+        "proc-macro2": [
+          {
+            "version": "1.0.107",
+            "rename": "proc_macro2"
+          }
+        ]
+      },
+      "build_rust_crate_args": {
+        "crateName": "ref-cast-impl",
+        "version": "1.0.27",
+        "edition": "2021",
+        "crateRenames": {
+          "proc-macro2": [
+            {
+              "version": "1.0.107",
+              "rename": "proc_macro2"
+            }
+          ]
+        },
+        "release": true,
+        "procMacro": true,
+        "preBuild": "export CARGO_CRATE_NAME=ref_cast_impl;"
+      }
+    },
     "rustversion-1.0.23": {
       "name": "rustversion",
       "version": "1.0.23",
@@ -2691,6 +2832,210 @@
         "preBuild": "export CARGO_CRATE_NAME=same_file;"
       }
     },
+    "schemars-1.2.3": {
+      "name": "schemars",
+      "version": "1.2.3",
+      "edition": "2021",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/schemars/schemars-1.2.3.crate",
+        "sha256": "ab508826f74a77ca9d5aba6ff19b522583ee3eaf28a19384ff3d0e5835fadf6e",
+        "name_with_ext": "schemars-1.2.3.tar.gz"
+      },
+      "features": [
+        "default",
+        "derive",
+        "schemars_derive",
+        "std"
+      ],
+      "proc_macro": false,
+      "build_script": null,
+      "links": null,
+      "binaries": [],
+      "lib_target": null,
+      "runtime_dependencies": [
+        {
+          "name": "dyn_clone",
+          "package_key": "dyn-clone-1.0.20",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "ref_cast",
+          "package_key": "ref-cast-1.0.27",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "schemars_derive",
+          "package_key": "schemars_derive-1.2.3",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": true,
+          "target": null,
+          "tree": "host"
+        },
+        {
+          "name": "serde",
+          "package_key": "serde-1.0.229",
+          "kind": "normal",
+          "features": [
+            "alloc"
+          ],
+          "uses_default_features": false,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "serde_json",
+          "package_key": "serde_json-1.0.151",
+          "kind": "normal",
+          "features": [
+            "alloc"
+          ],
+          "uses_default_features": false,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        }
+      ],
+      "build_dependencies": [],
+      "crate_renames": {
+        "dyn-clone": [
+          {
+            "version": "1.0.20",
+            "rename": "dyn_clone"
+          }
+        ],
+        "ref-cast": [
+          {
+            "version": "1.0.27",
+            "rename": "ref_cast"
+          }
+        ]
+      },
+      "build_rust_crate_args": {
+        "crateName": "schemars",
+        "version": "1.2.3",
+        "edition": "2021",
+        "features": [
+          "default",
+          "derive",
+          "schemars_derive",
+          "std"
+        ],
+        "crateRenames": {
+          "dyn-clone": [
+            {
+              "version": "1.0.20",
+              "rename": "dyn_clone"
+            }
+          ],
+          "ref-cast": [
+            {
+              "version": "1.0.27",
+              "rename": "ref_cast"
+            }
+          ]
+        },
+        "release": true,
+        "preBuild": "export CARGO_CRATE_NAME=schemars;"
+      }
+    },
+    "schemars_derive-1.2.3": {
+      "name": "schemars_derive",
+      "version": "1.2.3",
+      "edition": "2021",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/schemars_derive/schemars_derive-1.2.3.crate",
+        "sha256": "e1c3a92094fa7d61aa124645844facb6b554dfc797136d0f5fd1f890e2bffc69",
+        "name_with_ext": "schemars_derive-1.2.3.tar.gz"
+      },
+      "features": [],
+      "proc_macro": true,
+      "build_script": null,
+      "links": null,
+      "binaries": [],
+      "lib_target": null,
+      "runtime_dependencies": [
+        {
+          "name": "proc_macro2",
+          "package_key": "proc-macro2-1.0.107",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "quote",
+          "package_key": "quote-1.0.47",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "serde_derive_internals",
+          "package_key": "serde_derive_internals-0.30.0",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "syn",
+          "package_key": "syn-3.0.9",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        }
+      ],
+      "build_dependencies": [],
+      "crate_renames": {
+        "proc-macro2": [
+          {
+            "version": "1.0.107",
+            "rename": "proc_macro2"
+          }
+        ]
+      },
+      "build_rust_crate_args": {
+        "crateName": "schemars_derive",
+        "version": "1.2.3",
+        "edition": "2021",
+        "crateRenames": {
+          "proc-macro2": [
+            {
+              "version": "1.0.107",
+              "rename": "proc_macro2"
+            }
+          ]
+        },
+        "release": true,
+        "procMacro": true,
+        "preBuild": "export CARGO_CRATE_NAME=schemars_derive;"
+      }
+    },
     "serde-1.0.229": {
       "name": "serde",
       "version": "1.0.229",
@@ -2702,6 +3047,7 @@
         "name_with_ext": "serde-1.0.229.tar.gz"
       },
       "features": [
+        "alloc",
         "default",
         "derive",
         "serde_derive",
@@ -2743,6 +3089,7 @@
         "version": "1.0.229",
         "edition": "2021",
         "features": [
+          "alloc",
           "default",
           "derive",
           "serde_derive",
@@ -2764,6 +3111,7 @@
         "name_with_ext": "serde_core-1.0.229.tar.gz"
       },
       "features": [
+        "alloc",
         "result",
         "std"
       ],
@@ -2780,6 +3128,7 @@
         "version": "1.0.229",
         "edition": "2021",
         "features": [
+          "alloc",
           "result",
           "std"
         ],
@@ -2877,6 +3226,89 @@
         "preBuild": "export CARGO_CRATE_NAME=serde_derive;"
       }
     },
+    "serde_derive_internals-0.30.0": {
+      "name": "serde_derive_internals",
+      "version": "0.30.0",
+      "edition": "2021",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/serde_derive_internals/serde_derive_internals-0.30.0.crate",
+        "sha256": "f852137cce035d6a4df67ccce505ff6b3e9fd3a10e3e52b24dc71e650bb1a9bd",
+        "name_with_ext": "serde_derive_internals-0.30.0.tar.gz"
+      },
+      "features": [],
+      "proc_macro": false,
+      "build_script": null,
+      "links": null,
+      "binaries": [],
+      "lib_target": {
+        "name": "serde_derive_internals",
+        "path": "lib.rs"
+      },
+      "runtime_dependencies": [
+        {
+          "name": "proc_macro2",
+          "package_key": "proc-macro2-1.0.107",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": false,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "quote",
+          "package_key": "quote-1.0.47",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": false,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
+          "name": "syn",
+          "package_key": "syn-3.0.9",
+          "kind": "normal",
+          "features": [
+            "clone-impls",
+            "derive",
+            "parsing",
+            "printing"
+          ],
+          "uses_default_features": false,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        }
+      ],
+      "build_dependencies": [],
+      "crate_renames": {
+        "proc-macro2": [
+          {
+            "version": "1.0.107",
+            "rename": "proc_macro2"
+          }
+        ]
+      },
+      "build_rust_crate_args": {
+        "crateName": "serde_derive_internals",
+        "version": "0.30.0",
+        "edition": "2021",
+        "crateRenames": {
+          "proc-macro2": [
+            {
+              "version": "1.0.107",
+              "rename": "proc_macro2"
+            }
+          ]
+        },
+        "release": true,
+        "libName": "serde_derive_internals",
+        "libPath": "lib.rs",
+        "preBuild": "export CARGO_CRATE_NAME=serde_derive_internals;"
+      }
+    },
     "serde_json-1.0.151": {
       "name": "serde_json",
       "version": "1.0.151",
@@ -2888,6 +3320,7 @@
         "name_with_ext": "serde_json-1.0.151.tar.gz"
       },
       "features": [
+        "alloc",
         "default",
         "std"
       ],
@@ -2945,6 +3378,7 @@
         "version": "1.0.151",
         "edition": "2021",
         "features": [
+          "alloc",
           "default",
           "std"
         ],
@@ -2953,58 +3387,15 @@
         "preBuild": "export CARGO_CRATE_NAME=serde_json;"
       }
     },
-    "serde_spanned-0.6.9": {
-      "name": "serde_spanned",
-      "version": "0.6.9",
+    "serde_norway-0.9.42": {
+      "name": "serde_norway",
+      "version": "0.9.42",
       "edition": "2021",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/serde_spanned/serde_spanned-0.6.9.crate",
-        "sha256": "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3",
-        "name_with_ext": "serde_spanned-0.6.9.tar.gz"
-      },
-      "features": [
-        "serde"
-      ],
-      "proc_macro": false,
-      "build_script": null,
-      "links": null,
-      "binaries": [],
-      "lib_target": null,
-      "runtime_dependencies": [
-        {
-          "name": "serde",
-          "package_key": "serde-1.0.229",
-          "kind": "normal",
-          "features": [],
-          "uses_default_features": true,
-          "optional": true,
-          "target": null,
-          "tree": "target"
-        }
-      ],
-      "build_dependencies": [],
-      "crate_renames": {},
-      "build_rust_crate_args": {
-        "crateName": "serde_spanned",
-        "version": "0.6.9",
-        "edition": "2021",
-        "features": [
-          "serde"
-        ],
-        "release": true,
-        "preBuild": "export CARGO_CRATE_NAME=serde_spanned;"
-      }
-    },
-    "serde_yaml-0.9.34+deprecated": {
-      "name": "serde_yaml",
-      "version": "0.9.34+deprecated",
-      "edition": "2021",
-      "source": {
-        "kind": "registry",
-        "url": "https://static.crates.io/crates/serde_yaml/serde_yaml-0.9.34+deprecated.crate",
-        "sha256": "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47",
-        "name_with_ext": "serde_yaml-0.9.34+deprecated.tar.gz"
+        "url": "https://static.crates.io/crates/serde_norway/serde_norway-0.9.42.crate",
+        "sha256": "e408f29489b5fd500fab51ff1484fc859bb655f32c671f307dcd733b72e8168c",
+        "name_with_ext": "serde_norway-0.9.42.tar.gz"
       },
       "features": [],
       "proc_macro": false,
@@ -3054,8 +3445,8 @@
           "tree": "target"
         },
         {
-          "name": "unsafe_libyaml",
-          "package_key": "unsafe-libyaml-0.2.11",
+          "name": "unsafe_libyaml_norway",
+          "package_key": "unsafe-libyaml-norway-0.2.15",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -3066,38 +3457,81 @@
       ],
       "build_dependencies": [],
       "crate_renames": {
-        "unsafe-libyaml": [
+        "unsafe-libyaml-norway": [
           {
-            "version": "0.2.11",
-            "rename": "unsafe_libyaml"
+            "version": "0.2.15",
+            "rename": "unsafe_libyaml_norway"
           }
         ]
       },
       "build_rust_crate_args": {
-        "crateName": "serde_yaml",
-        "version": "0.9.34+deprecated",
+        "crateName": "serde_norway",
+        "version": "0.9.42",
         "edition": "2021",
         "crateRenames": {
-          "unsafe-libyaml": [
+          "unsafe-libyaml-norway": [
             {
-              "version": "0.2.11",
-              "rename": "unsafe_libyaml"
+              "version": "0.2.15",
+              "rename": "unsafe_libyaml_norway"
             }
           ]
         },
         "release": true,
-        "preBuild": "export CARGO_CRATE_NAME=serde_yaml;"
+        "preBuild": "export CARGO_CRATE_NAME=serde_norway;"
       }
     },
-    "shikumi-0.1.733": {
+    "serde_spanned-0.6.9": {
+      "name": "serde_spanned",
+      "version": "0.6.9",
+      "edition": "2021",
+      "source": {
+        "kind": "registry",
+        "url": "https://static.crates.io/crates/serde_spanned/serde_spanned-0.6.9.crate",
+        "sha256": "bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3",
+        "name_with_ext": "serde_spanned-0.6.9.tar.gz"
+      },
+      "features": [
+        "serde"
+      ],
+      "proc_macro": false,
+      "build_script": null,
+      "links": null,
+      "binaries": [],
+      "lib_target": null,
+      "runtime_dependencies": [
+        {
+          "name": "serde",
+          "package_key": "serde-1.0.229",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": true,
+          "target": null,
+          "tree": "target"
+        }
+      ],
+      "build_dependencies": [],
+      "crate_renames": {},
+      "build_rust_crate_args": {
+        "crateName": "serde_spanned",
+        "version": "0.6.9",
+        "edition": "2021",
+        "features": [
+          "serde"
+        ],
+        "release": true,
+        "preBuild": "export CARGO_CRATE_NAME=serde_spanned;"
+      }
+    },
+    "shikumi-0.1.1084": {
       "name": "shikumi",
-      "version": "0.1.733",
+      "version": "0.1.1084",
       "edition": "2024",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/shikumi/shikumi-0.1.733.crate",
-        "sha256": "05ee7f2bc0bdfb151b6d0916cf9dd74f8bfeb7ce984d0489b6b14f3f51b9a094",
-        "name_with_ext": "shikumi-0.1.733.tar.gz"
+        "url": "https://static.crates.io/crates/shikumi/shikumi-0.1.1084.crate",
+        "sha256": "d340f2caa2bc6c020e7223bc89cd330687a9dd2aacdcfe6686f46ba1339ea1c1",
+        "name_with_ext": "shikumi-0.1.1084.tar.gz"
       },
       "features": [
         "default"
@@ -3134,8 +3568,7 @@
           "kind": "normal",
           "features": [
             "env",
-            "toml",
-            "yaml"
+            "toml"
           ],
           "uses_default_features": true,
           "optional": false,
@@ -3144,7 +3577,7 @@
         },
         {
           "name": "gen_platform",
-          "package_key": "gen-platform-0.1.48",
+          "package_key": "gen-platform-0.1.55",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -3154,7 +3587,7 @@
         },
         {
           "name": "gen_types",
-          "package_key": "gen-types-0.1.48",
+          "package_key": "gen-types-0.1.55",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -3185,6 +3618,16 @@
           "tree": "target"
         },
         {
+          "name": "schemars",
+          "package_key": "schemars-1.2.3",
+          "kind": "normal",
+          "features": [],
+          "uses_default_features": true,
+          "optional": false,
+          "target": null,
+          "tree": "target"
+        },
+        {
           "name": "serde",
           "package_key": "serde-1.0.229",
           "kind": "normal",
@@ -3207,8 +3650,8 @@
           "tree": "target"
         },
         {
-          "name": "serde_yaml",
-          "package_key": "serde_yaml-0.9.34+deprecated",
+          "name": "serde_norway",
+          "package_key": "serde_norway-0.9.42",
           "kind": "normal",
           "features": [],
           "uses_default_features": true,
@@ -3253,20 +3696,20 @@
         ],
         "gen-platform": [
           {
-            "version": "0.1.48",
+            "version": "0.1.55",
             "rename": "gen_platform"
           }
         ],
         "gen-types": [
           {
-            "version": "0.1.48",
+            "version": "0.1.55",
             "rename": "gen_types"
           }
         ]
       },
       "build_rust_crate_args": {
         "crateName": "shikumi",
-        "version": "0.1.733",
+        "version": "0.1.1084",
         "edition": "2024",
         "features": [
           "default"
@@ -3286,13 +3729,13 @@
           ],
           "gen-platform": [
             {
-              "version": "0.1.48",
+              "version": "0.1.55",
               "rename": "gen_platform"
             }
           ],
           "gen-types": [
             {
-              "version": "0.1.48",
+              "version": "0.1.55",
               "rename": "gen_types"
             }
           ]
@@ -4551,15 +4994,15 @@
         "preBuild": "export CARGO_CRATE_NAME=unicode_ident;"
       }
     },
-    "unsafe-libyaml-0.2.11": {
-      "name": "unsafe-libyaml",
-      "version": "0.2.11",
+    "unsafe-libyaml-norway-0.2.15": {
+      "name": "unsafe-libyaml-norway",
+      "version": "0.2.15",
       "edition": "2021",
       "source": {
         "kind": "registry",
-        "url": "https://static.crates.io/crates/unsafe-libyaml/unsafe-libyaml-0.2.11.crate",
-        "sha256": "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861",
-        "name_with_ext": "unsafe-libyaml-0.2.11.tar.gz"
+        "url": "https://static.crates.io/crates/unsafe-libyaml-norway/unsafe-libyaml-norway-0.2.15.crate",
+        "sha256": "b39abd59bf32521c7f2301b52d05a6a2c975b6003521cbd0c6dc1582f0a22104",
+        "name_with_ext": "unsafe-libyaml-norway-0.2.15.tar.gz"
       },
       "features": [],
       "proc_macro": false,
@@ -4580,11 +5023,11 @@
       "build_dependencies": [],
       "crate_renames": {},
       "build_rust_crate_args": {
-        "crateName": "unsafe-libyaml",
-        "version": "0.2.11",
+        "crateName": "unsafe-libyaml-norway",
+        "version": "0.2.15",
         "edition": "2021",
         "release": true,
-        "preBuild": "export CARGO_CRATE_NAME=unsafe_libyaml;"
+        "preBuild": "export CARGO_CRATE_NAME=unsafe_libyaml_norway;"
       }
     },
     "version_check-0.9.5": {
@@ -4815,8 +5258,8 @@
             "tree": "target"
           },
           {
-            "name": "serde_yaml",
-            "package_key": "serde_yaml-0.9.34+deprecated",
+            "name": "serde_norway",
+            "package_key": "serde_norway-0.9.42",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -4826,7 +5269,7 @@
           },
           {
             "name": "shikumi",
-            "package_key": "shikumi-0.1.733",
+            "package_key": "shikumi-0.1.1084",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -5010,6 +5453,11 @@
           "std"
         ]
       },
+      "dyn-clone-1.0.20": {
+        "runtime_dependencies": [],
+        "build_dependencies": [],
+        "features": []
+      },
       "equivalent-1.0.2": {
         "runtime_dependencies": [],
         "build_dependencies": [],
@@ -5034,16 +5482,6 @@
             "features": [],
             "uses_default_features": true,
             "optional": false,
-            "target": null,
-            "tree": "target"
-          },
-          {
-            "name": "serde_yaml",
-            "package_key": "serde_yaml-0.9.34+deprecated",
-            "kind": "normal",
-            "features": [],
-            "uses_default_features": true,
-            "optional": true,
             "target": null,
             "tree": "target"
           },
@@ -5084,9 +5522,7 @@
           "env",
           "parse-value",
           "pear",
-          "serde_yaml",
-          "toml",
-          "yaml"
+          "toml"
         ]
       },
       "find-msvc-tools-0.1.15": {
@@ -5094,7 +5530,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "gen-macros-0.1.48": {
+      "gen-macros-0.1.55": {
         "runtime_dependencies": [
           {
             "name": "proc_macro2",
@@ -5133,11 +5569,11 @@
         "build_dependencies": [],
         "features": []
       },
-      "gen-platform-0.1.48": {
+      "gen-platform-0.1.55": {
         "runtime_dependencies": [
           {
             "name": "gen_macros",
-            "package_key": "gen-macros-0.1.48",
+            "package_key": "gen-macros-0.1.55",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -5147,7 +5583,7 @@
           },
           {
             "name": "gen_types",
-            "package_key": "gen-types-0.1.48",
+            "package_key": "gen-types-0.1.55",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -5201,7 +5637,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "gen-types-0.1.48": {
+      "gen-types-0.1.55": {
         "runtime_dependencies": [
           {
             "name": "blake3",
@@ -5763,6 +6199,58 @@
           "proc-macro"
         ]
       },
+      "ref-cast-1.0.27": {
+        "runtime_dependencies": [
+          {
+            "name": "ref_cast_impl",
+            "package_key": "ref-cast-impl-1.0.27",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "host"
+          }
+        ],
+        "build_dependencies": [],
+        "features": []
+      },
+      "ref-cast-impl-1.0.27": {
+        "runtime_dependencies": [
+          {
+            "name": "proc_macro2",
+            "package_key": "proc-macro2-1.0.107",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "quote",
+            "package_key": "quote-1.0.47",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "syn",
+            "package_key": "syn-3.0.9",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          }
+        ],
+        "build_dependencies": [],
+        "features": []
+      },
       "rustversion-1.0.23": {
         "runtime_dependencies": [],
         "build_dependencies": [],
@@ -5775,6 +6263,117 @@
       },
       "same-file-1.0.6": {
         "runtime_dependencies": [],
+        "build_dependencies": [],
+        "features": []
+      },
+      "schemars-1.2.3": {
+        "runtime_dependencies": [
+          {
+            "name": "dyn_clone",
+            "package_key": "dyn-clone-1.0.20",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "ref_cast",
+            "package_key": "ref-cast-1.0.27",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "schemars_derive",
+            "package_key": "schemars_derive-1.2.3",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": true,
+            "target": null,
+            "tree": "host"
+          },
+          {
+            "name": "serde",
+            "package_key": "serde-1.0.229",
+            "kind": "normal",
+            "features": [
+              "alloc"
+            ],
+            "uses_default_features": false,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "serde_json",
+            "package_key": "serde_json-1.0.151",
+            "kind": "normal",
+            "features": [
+              "alloc"
+            ],
+            "uses_default_features": false,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          }
+        ],
+        "build_dependencies": [],
+        "features": [
+          "default",
+          "derive",
+          "schemars_derive",
+          "std"
+        ]
+      },
+      "schemars_derive-1.2.3": {
+        "runtime_dependencies": [
+          {
+            "name": "proc_macro2",
+            "package_key": "proc-macro2-1.0.107",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "quote",
+            "package_key": "quote-1.0.47",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "serde_derive_internals",
+            "package_key": "serde_derive_internals-0.30.0",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "syn",
+            "package_key": "syn-3.0.9",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          }
+        ],
         "build_dependencies": [],
         "features": []
       },
@@ -5805,6 +6404,7 @@
         ],
         "build_dependencies": [],
         "features": [
+          "alloc",
           "default",
           "derive",
           "serde_derive",
@@ -5815,6 +6415,7 @@
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": [
+          "alloc",
           "result",
           "std"
         ]
@@ -5867,6 +6468,47 @@
           "default"
         ]
       },
+      "serde_derive_internals-0.30.0": {
+        "runtime_dependencies": [
+          {
+            "name": "proc_macro2",
+            "package_key": "proc-macro2-1.0.107",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": false,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "quote",
+            "package_key": "quote-1.0.47",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": false,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
+            "name": "syn",
+            "package_key": "syn-3.0.9",
+            "kind": "normal",
+            "features": [
+              "clone-impls",
+              "derive",
+              "parsing",
+              "printing"
+            ],
+            "uses_default_features": false,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          }
+        ],
+        "build_dependencies": [],
+        "features": []
+      },
       "serde_json-1.0.151": {
         "runtime_dependencies": [
           {
@@ -5912,29 +6554,12 @@
         ],
         "build_dependencies": [],
         "features": [
+          "alloc",
           "default",
           "std"
         ]
       },
-      "serde_spanned-0.6.9": {
-        "runtime_dependencies": [
-          {
-            "name": "serde",
-            "package_key": "serde-1.0.229",
-            "kind": "normal",
-            "features": [],
-            "uses_default_features": true,
-            "optional": true,
-            "target": null,
-            "tree": "target"
-          }
-        ],
-        "build_dependencies": [],
-        "features": [
-          "serde"
-        ]
-      },
-      "serde_yaml-0.9.34+deprecated": {
+      "serde_norway-0.9.42": {
         "runtime_dependencies": [
           {
             "name": "indexmap",
@@ -5977,8 +6602,8 @@
             "tree": "target"
           },
           {
-            "name": "unsafe_libyaml",
-            "package_key": "unsafe-libyaml-0.2.11",
+            "name": "unsafe_libyaml_norway",
+            "package_key": "unsafe-libyaml-norway-0.2.15",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -5990,7 +6615,25 @@
         "build_dependencies": [],
         "features": []
       },
-      "shikumi-0.1.733": {
+      "serde_spanned-0.6.9": {
+        "runtime_dependencies": [
+          {
+            "name": "serde",
+            "package_key": "serde-1.0.229",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": true,
+            "target": null,
+            "tree": "target"
+          }
+        ],
+        "build_dependencies": [],
+        "features": [
+          "serde"
+        ]
+      },
+      "shikumi-0.1.1084": {
         "runtime_dependencies": [
           {
             "name": "arc_swap",
@@ -6018,8 +6661,7 @@
             "kind": "normal",
             "features": [
               "env",
-              "toml",
-              "yaml"
+              "toml"
             ],
             "uses_default_features": true,
             "optional": false,
@@ -6028,7 +6670,7 @@
           },
           {
             "name": "gen_platform",
-            "package_key": "gen-platform-0.1.48",
+            "package_key": "gen-platform-0.1.55",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -6038,7 +6680,7 @@
           },
           {
             "name": "gen_types",
-            "package_key": "gen-types-0.1.48",
+            "package_key": "gen-types-0.1.55",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -6069,6 +6711,16 @@
             "tree": "target"
           },
           {
+            "name": "schemars",
+            "package_key": "schemars-1.2.3",
+            "kind": "normal",
+            "features": [],
+            "uses_default_features": true,
+            "optional": false,
+            "target": null,
+            "tree": "target"
+          },
+          {
             "name": "serde",
             "package_key": "serde-1.0.229",
             "kind": "normal",
@@ -6091,8 +6743,8 @@
             "tree": "target"
           },
           {
-            "name": "serde_yaml",
-            "package_key": "serde_yaml-0.9.34+deprecated",
+            "name": "serde_norway",
+            "package_key": "serde_norway-0.9.42",
             "kind": "normal",
             "features": [],
             "uses_default_features": true,
@@ -6737,7 +7389,7 @@
         "build_dependencies": [],
         "features": []
       },
-      "unsafe-libyaml-0.2.11": {
+      "unsafe-libyaml-norway-0.2.15": {
         "runtime_dependencies": [],
         "build_dependencies": [],
         "features": []
@@ -7949,8 +8601,8 @@
       }
     }
   },
-  "cargo_lock_sha256": "1f7a865410c830f75ba9195331550100f04d714a9fa1bb1cbb2f68834935899f",
+  "cargo_lock_sha256": "be3d3264726c7355d9b52bb98cf47637dd49170319d52c6e142d6a522ce941dc",
   "manifest_sha256": {
-    "Cargo.toml": "48d480b77614f97ae3c9a962c2eb1f1eeb0f560d2ea33317b7d8777cc02a06ff"
+    "Cargo.toml": "b9eec85fd11bb0ffa2595b59be429adcaf4e02871cdf27429beafa87760af4af"
   }
 }
