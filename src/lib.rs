@@ -2,7 +2,7 @@
 //!
 //! ── WHY THIS EXISTS ────────────────────────────────────────────────────
 //!
-//! `theory/NATURALIZE-NIXOS.md` costed replacing `dnsmasq` as "REIMPLEMENT,
+//! The first estimate costed replacing `dnsmasq` as "REIMPLEMENT,
 //! RFC 1035", which prices an authoritative DNS server and reads as months.
 //! Measured on plo 2026-08-28, dnsmasq's entire configuration is eight lines
 //! with no `dhcp-range` anywhere, and what it does is:

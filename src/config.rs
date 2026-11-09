@@ -189,8 +189,8 @@ pub fn load() -> AnnaiConfig {
     // ★ THE SAME COLLISION IS PRESENT IN `omoya` (OMOYA_CONFIG / OMOYA_) AND
     // `mukae` (MUKAE_CONFIG / MUKAE_), which is where this idiom was copied
     // from. Both are latent -- they break only when someone actually uses the
-    // documented override -- and both are recorded in
-    // theory/NATURALIZE-NIXOS.md rather than fixed here, because changing an
+    // documented override -- and both are left unfixed here
+    // because changing an
     // env-var contract on the login manager is its own reviewable change.
     match shikumi::ConfigStore::<AnnaiConfig>::load(&path, "ANNAI_OPT_") {
         Ok(store) => AnnaiConfig::clone(&store.get()),

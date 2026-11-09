@@ -30,7 +30,7 @@ on nodes with `pleme.fleetDns.zoneResolver` on (nix repo,
 
 ## Why
 
-`theory/NATURALIZE-NIXOS.md` costed replacing dnsmasq as REIMPLEMENT against
+The first estimate costed replacing dnsmasq as REIMPLEMENT against
 RFC 1035 — the price of an authoritative DNS server, read as months. Measured
 on plo 2026-08-28, dnsmasq's whole configuration is eight lines with no
 `dhcp-range` anywhere, and what it does is: answer from a local table, forward

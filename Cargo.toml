@@ -7,7 +7,7 @@ description = "annai (案内) — the fleet stub resolver: answer from a typed n
 repository = "https://github.com/pleme-io/annai"
 
 [dependencies]
-# ★★ The citizen shape (theory/NATURALIZE-NIXOS.md VII.1): config is shikumi,
+# ★★ The citizen shape: config is shikumi,
 # introspection is kanshou. annai is the FOURTH daemon to compose it, and the
 # cost of these two files against mukae's and sentinela's is the measurement
 # that falsifies -- or supports -- the compounding claim.
